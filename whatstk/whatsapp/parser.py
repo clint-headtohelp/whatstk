@@ -35,7 +35,8 @@ regex_simplifier = {
 
 
 def df_from_whatsapp(
-    filepath: str,
+    filepath:  Optional[str] = None,
+    file_content: Optional[str] = None,
     auto_header: bool = True,
     hformat: Optional[str] = None,
     encoding: str = "utf-8",
@@ -44,13 +45,14 @@ def df_from_whatsapp(
     """Load chat as a DataFrame.
 
     Args:
-        filepath (str): Path to the file. Accepted sources are:
+        filepath (str,optional): Path to the file. Accepted sources are:
 
                 * Local file, e.g. 'path/to/file.txt' OR 'path/to/_chat.zip' (e.g. iOS export).
                 * URL to a remote hosted file, e.g. 'http://www.url.to/file.txt'.
                 * Link to Google Drive file, e.g. 'gdrive://35gKKrNk-i3t05zPLyH4_P1rPdOmKW9NZ'. The format is expected
                   to be 'gdrive://[FILE-ID]'. Note that in order to load a file from Google Drive you first need to run
                   :func:`gdrive_init <whatstk.utils.gdrive.gdrive_init>`.
+        filecontent (str, optional): Content of the file. if filecontent is provided, filepath is ignored.
         auto_header (bool, optional): Detect header automatically. If False, ``hformat`` is required.
         hformat (str, optional): :ref:`Format of the header <The header format>`, e.g.
                                     ``'[%y-%m-%d %H:%M:%S] - %name:'``. Use following keywords:
@@ -120,8 +122,12 @@ def df_from_whatsapp(
         * :func:`gdrive_init <whatstk.utils.gdrive.gdrive_init>`
 
     """
-    # Read local file
-    text = _str_from_file(filepath, encoding)
+    if file_content:
+        text = file_content
+    elif filepath:
+        text = _str_from_file(filepath, encoding)
+    else:
+        raise ValueError("Either `filepath` or `file_content` must be provided.")
 
     # Clean text from unwanted unicode characters
     text = _clean_text(text)
