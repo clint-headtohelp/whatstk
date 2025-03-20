@@ -378,11 +378,16 @@ def _parse_line(text: str, headers: List[str], i: int) -> Dict[str, str]:
     else:
         hour = int(result_["hour"])
 
-    # Check format of year. If year is 2-digit represented we add 2000
-    if len(result_["year"]) == 2:
-        year = int(result_["year"]) + 2000
+    # Check if year exists in the result
+    if "year" in result_:
+        # Check format of year. If year is 2-digit represented we add 2000
+        if len(result_["year"]) == 2:
+            year = int(result_["year"]) + 2000
+        else:
+            year = int(result_["year"])
     else:
-        year = int(result_["year"])
+        # If year is not present, use current year as default
+        year = datetime.now().year
 
     if "seconds" not in result_:
         date = datetime(
